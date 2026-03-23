@@ -1,6 +1,7 @@
 # The Genetic Algorithm for creating chromosomes for feature selection
 import random
 from getdata import load
+from classifier import avg_accuracy
 
 # Load Dataset
 load()
@@ -14,15 +15,11 @@ ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
 GENERATIONS = 100000 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = 0.9 # To be changed to the average accuracy of an 8-feature run of the model
+MAX_FITNESS = avg_accuracy((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # The avg fitness of the chromosome with all features
 COUNT = 0
 
 # Storage
 cache = {} # Caches the average fitness of each chromsome to prevent excessive training (chromosome -> fitness)
-
-# Placeholder fitness function for fitness generation
-def placeholder(c): 
-    return random.random()
 
 # Fitness function
 def fitness(c: tuple):
@@ -30,15 +27,12 @@ def fitness(c: tuple):
     if cache.get(c) is not None:
         return cache[c]
     
-    # Punish for more features, reward for less features
+    # Punish for 8&0 features
     if sum(c) == 8 or sum(c) == 0: # If all or none of the features are selected, punish heavily
         return 0
     
     # Else, run it thrice and take the average
-    fit = 0
-    for _ in range(3):
-        fit += placeholder(c) # Get the accuracy of the model with the features selected by the chromosome TODO: Replace with actual model accuracy
-    fit /= 3
+    fit = avg_accuracy(c, runs=3)
 
     # Cache fitness and return
     cache[c] = fit
