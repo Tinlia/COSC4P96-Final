@@ -1,0 +1,1 @@
+# The Random Forest Classifier for getting the fitness of the GA's chromosomes
