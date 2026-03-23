@@ -44,7 +44,15 @@ def fitness(c: tuple):
 
 # Mutation method
 def mutation(chromosome):
-    return gen_chromosome() # Placeholder TODO Flesh out mutation
+    # Create a copy of the chromosome
+    mutated = list(chromosome)
+
+    # Mutation core
+    for i in range(CHROMOSOME_LENGTH):
+        if random.random() < MUTATION_RATE: # Odds of cell mutation = Odds of chromosome mutation
+            mutated[i] = 1 - mutated[i] # Flips between 0 and 1
+
+    return tuple(mutated) # Return the mutated chromosome
 
 # Crossover Method
 def crossover(p1, p2):
