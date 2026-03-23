@@ -1,5 +1,9 @@
 # The Genetic Algorithm for creating chromosomes for feature selection
 import random
+from getdata import load
+
+# Load Dataset
+load()
 
 # Hyperparameters
 CHROMOSOME_LENGTH = 8
