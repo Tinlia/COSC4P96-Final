@@ -56,7 +56,10 @@ def mutation(chromosome):
 
 # Crossover Method
 def crossover(p1, p2):
-    return [gen_chromosome(), gen_chromosome()] # Placeholder TODO Flesh out crossover
+    split = random.randint(1, CHROMOSOME_LENGTH - 1) # Point to split on
+    c1 = p1[:split] + p2[split:] # Child 1 
+    c2 = p2[:split] + p1[split:] # Child 2
+    return [c1, c2] # Return the two child chromosomes
 
 def tournament_selection(pops):
     # Intake a list of k chromosomes with their fitnesses attached
