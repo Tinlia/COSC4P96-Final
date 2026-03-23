@@ -10,7 +10,6 @@ ELITISM_RATE = 0.1
 GENERATIONS = 100 
 TOURNAMENT_SIZE = 4
 MAX_FITNESS = 1.0 # To be changed to the average accuracy of an 8-feature run of the model
-COUNT = 0
 
 # Storage
 cache = {} # Caches the average fitness of each chromsome to prevent excessive training (chromosome -> fitness)
@@ -21,9 +20,6 @@ def placeholder(c):
 
 # Fitness function
 def fitness(c: tuple):
-    global COUNT
-    print(f"{COUNT} : {str(c)}")
-    COUNT += 1
     # Check cache for fitness and return it if it exists
     if cache.get(c) is not None:
         return cache[c]
@@ -84,13 +80,10 @@ for _ in range(POPULATION_SIZE):
 
 # Run generations
 for g in range(GENERATIONS):
-
-    print(f"Population size at generation {g}: {len(pop)}")
     # Fetch fitnesses
     for i in range(POPULATION_SIZE):
         fit = fitness(pop[i][0])
         pop[i] = (pop[i][0], fit) # Update fitness in population
-    print("Gah")
     # Sort fitnesses desc.
     pop.sort(key=lambda x: x[1], reverse=True) 
 
