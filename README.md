@@ -54,3 +54,19 @@ def get() -> list[list]:
     return dataset
 ```
 
+
+# GA Structure
+The Genetic Algorithm takes in the number of features in the dataset and produces chromosomes in the format `[0, 1, 1, 1, 0, 1, 0, 1]` with `0` representing a feature to omit and `1` representing a feature to keep.
+
+## Fitness
+Chromosome fitness is determined by the average accuracy of the model trained on the feature subset across 3 runs.
+
+## Crossover
+The GA uses single-point, two-parent crossover. For each pair of chromosomes, there is a `CROSSOVER_RATE` chance of crossover occuring. The resulting two children are added to the new population
+
+## Mutation
+All non-elite, non-diverse chromosomes have a `MUTATION_RATE` chance of mutating. If the mutation chance hits, each cell then has a `MUTATION_RATE` chance of flipping bits. The resulting chromosome is added to the new population.
+
+## Elitism and Diversity
+By default, 10% of the population is Elite and 10% is Diverse.
+
