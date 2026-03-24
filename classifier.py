@@ -35,5 +35,4 @@ def avg_accuracy(c: tuple, runs=3) -> float:
     # Run eval thrice
     for i in range(runs):
         acc += evaluate(c, i) # run num = seed for reproducibility
-        print(f"Run {i+1}/{runs} Accuracy: {acc/(i+1):.4f}")
     return float(acc / runs)
