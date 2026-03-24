@@ -16,6 +16,9 @@ cd COSC4P96-Final
 pip install -r requirements.txt
 ```
 
+## Dataset
+Currently, the dataset being used in training is the Pima Indian Diabetes Dataset ([PIDD](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database)). A lightweight dataset containing 8 features and 768 data points.
+
 # File Overview
 In total, there are two runnable files and two helper files.
 
@@ -70,3 +73,27 @@ All non-elite, non-diverse chromosomes have a `MUTATION_RATE` chance of mutating
 ## Elitism and Diversity
 By default, 10% of the population is Elite and 10% is Diverse.
 
+## Caching
+The nature of this project demands high computational expense. As such, a dictionary which holds chromosome:fitness(key:value) pairs is used to prevent the redundant retraining of feature subsets that have already been evaluated. This practice is explained further [here](#determinism-vs-stochasticity).
+```py
+def fitness(c: tuple):
+    # ...
+    if cache.get(c) is not None: return cache[c]
+    # ...
+    fit = avg_accuracy(c, runs=3)
+    cache[c] = fit
+    return fit
+```
+
+# RFC Training
+A simple Random Forest Classifier is used to determine the fitness of feature subsets. By default, the RFC has a max depth of 9 with 200 estimators. Due to the skew between positive and negative diagnoses within the [PIDD](#dataset)(~66% positive), we stratify the dataset when creating a test:train split.
+
+## Determinism vs Stochasticity
+Building on the idea of [caching](#caching), to keep computation expense low, we cache the fitnesses of feature subsets that have already been evaluated. This, of course, runs into the problem of potentially locking in a random solution and preventing a better one from appearing. To balance this out, we seed the train:test split to create deterministic data sampling. 
+```py
+x_train, x_test, y_train, y_test = train_test_split(..., random_state=1)
+```
+On the contrary, to keep an element of stochasticity in training, all training and testing is done on seeds 1-`k` where `k` is the number of times each subset is evaluated. The average of the `k` accuracies from training is then returned as the fitness. 
+```py
+rfc = RandomForestClassifier(..., random_state=seed) # Seed = run num
+```
