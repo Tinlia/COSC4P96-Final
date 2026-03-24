@@ -17,7 +17,7 @@ ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
 GENERATIONS = 500 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = avg_accuracy((1, 1, 1, 1, 1, 1, 1, 1), runs=3) + 1 # Equal to or better than the avg fitness of the chromosome with all features
+MAX_FITNESS = avg_accuracy((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # Equal to or better than the avg fitness of the chromosome with all features
 COUNT = 0
 
 # Storage
