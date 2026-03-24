@@ -15,9 +15,9 @@ MUTATION_RATE = 0.2
 CROSSOVER_RATE = 0.7
 ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
-GENERATIONS = 100000 
+GENERATIONS = 500 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = avg_accuracy((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # The avg fitness of the chromosome with all features
+MAX_FITNESS = avg_accuracy((1, 1, 1, 1, 1, 1, 1, 1), runs=3) + 1 # Equal to or better than the avg fitness of the chromosome with all features
 COUNT = 0
 
 # Storage
@@ -25,6 +25,7 @@ cache = {} # Caches the average fitness of each chromsome to prevent excessive t
 
 # Fitness function
 def fitness(c: tuple):
+    global COUNT
     # Check cache for fitness and return it if it exists
     if cache.get(c) is not None:
         return cache[c]
@@ -32,7 +33,7 @@ def fitness(c: tuple):
     # Punish for 8&0 features
     if sum(c) == 8 or sum(c) == 0: # If all or none of the features are selected, punish heavily
         return 0
-    
+    COUNT += 1
     # Else, run it thrice and take the average
     fit = avg_accuracy(c, runs=3)
 
@@ -73,7 +74,7 @@ def gen_chromosome() -> tuple:
 
 def get_time(chromosome) -> float:
     start = time.time()
-    fitness(chromosome)
+    avg_accuracy(chromosome)
     end = time.time()
     return end - start
 
@@ -87,6 +88,7 @@ g_hold = [] # For plotting the gen nums
 
 # Run generations
 for g in range(GENERATIONS):
+    COUNT = 0
     print(f"Generation {g+1}/{GENERATIONS}")
     # Fetch fitnesses
     for i in range(POPULATION_SIZE):
@@ -95,6 +97,8 @@ for g in range(GENERATIONS):
     
     # Sort fitnesses desc.
     pop.sort(key=lambda x: x[1], reverse=True) 
+    print(f"\tBest fitness: {pop[0][1]:.4f} with chromosome {str(pop[0][0])}")
+    print(f"\tNew Chromosomes this gen: {COUNT}")
     best_fits.append(pop[0][1])
     g_hold.append(g)
 
@@ -141,8 +145,8 @@ plt.plot(g_hold, best_fits)
 plt.xlabel("Generation")
 plt.ylabel("Best Fitness")
 plt.title("Best Fitness of Each Generation")
-plt.show()
 plt.savefig("outputs/plot.png")
+plt.show()
 
 # Compare best chromosome vs all features
 with open("outputs/comparison.txt", "w") as f:
