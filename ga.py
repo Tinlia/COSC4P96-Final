@@ -2,6 +2,8 @@
 import random
 from getdata import load
 from classifier import avg_accuracy
+import matplotlib.pyplot as plt
+import time
 
 # Load Dataset
 load()
@@ -69,13 +71,23 @@ def gen_chromosome() -> tuple:
             c[i] = 1
     return tuple(c)
 
+def get_time(chromosome) -> float:
+    start = time.time()
+    fitness(chromosome)
+    end = time.time()
+    return end - start
+
 # Gen Random Pop
 pop = []
 for _ in range(POPULATION_SIZE):
     pop.append(tuple((gen_chromosome(), 0))) # (chromosome, fitness)
 
+best_fits = [] # For plotting the best fitness of each gen
+g_hold = [] # For plotting the gen nums
+
 # Run generations
 for g in range(GENERATIONS):
+    print(f"Generation {g+1}/{GENERATIONS}")
     # Fetch fitnesses
     for i in range(POPULATION_SIZE):
         fit = fitness(pop[i][0])
@@ -83,6 +95,8 @@ for g in range(GENERATIONS):
     
     # Sort fitnesses desc.
     pop.sort(key=lambda x: x[1], reverse=True) 
+    best_fits.append(pop[0][1])
+    g_hold.append(g)
 
     # Break condition for max fitness
     if pop[0][1] >= MAX_FITNESS:
@@ -121,3 +135,29 @@ for g in range(GENERATIONS):
 
     # Update pop
     pop = new_pop
+
+# Plot data
+plt.plot(g_hold, best_fits)
+plt.xlabel("Generation")
+plt.ylabel("Best Fitness")
+plt.title("Best Fitness of Each Generation")
+plt.show()
+plt.savefig("outputs/plot.png")
+
+# Compare best chromosome vs all features
+with open("outputs/comparison.txt", "w") as f:
+    c = pop[0][0]
+    cfit = pop[0][1]
+    ctime = get_time(c)
+
+    all_c = (1, 1, 1, 1, 1, 1, 1, 1)
+    all_fit = MAX_FITNESS
+    all_time = get_time(all_c)
+
+    f.write(f"All features chromosome fitness: {all_fit:.4f}\n")
+    f.write(f"\tModel Accuracy: {all_fit:.4f}\n")
+    f.write(f"\tTime Taken: {all_time:.4f} seconds\n\n")
+
+    f.write(f"Best Chromosome {str(c)}\n")
+    f.write(f"\tModel Accuracy: {cfit:.4f}% (+{cfit - all_fit:.4f}%)\n")
+    f.write(f"\tTime Taken: {ctime:.4f} seconds (-{ctime - all_time:.4f}s)\n\n")
