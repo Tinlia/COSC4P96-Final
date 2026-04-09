@@ -1,8 +1,8 @@
 # COSC4P96-Final
-This project uses Genetic Algorithms to optimize feature selection on the Pima Indian Diabetes Dataset, combined with a simple Random Forest Classifier for evaluating the fitness of feature subsets. Built for the final project of COSC 4P96
+This project uses Genetic Algorithms to optimize feature selection on the Pima Indian Diabetes Dataset, combined with either a Random Forest or KNN classifier for evaluating the fitness of feature subsets. Built for the final project of COSC 4P96.
 
 ## Dependencies
-Running this project requires `matplotlib` for plotting fitness data and `scikit-learn` for the RFC implementation.
+Running this project requires `matplotlib` for plotting fitness data and `scikit-learn` for the RFC/KNN implementation.
 
 ## Quick Start
 1. Clone the repository into your editor
@@ -20,15 +20,15 @@ pip install -r requirements.txt
 Currently, the dataset being used in training is the Pima Indian Diabetes Dataset ([PIDD](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database)). A lightweight dataset containing 8 features and 768 data points.
 
 # File Overview
-In total, there are two runnable files and two helper files.
+In total, there are two runnable files and three helper files.
 
 ## ga.py
-This is the core file for optimizing feature selection in a database. `ga.py` contains the Genetic Algorithm for optimizing feature subsets and makes use of [getdata.py](#getdatapy) for pre-loading the database and [classifier.py](#classifierpy) for gathering the fitnesses of each chromosome.
+This is the core file for optimizing feature selection in a database. `ga.py` contains the Genetic Algorithm for optimizing feature subsets and makes use of [getdata.py](#getdatapy) for pre-loading the database and [rfc.py](#rfcpy) for gathering the fitnesses of each chromosome.
 
 ## bruteforce.py
-For smaller search spaces, `bruteforce.py` can be used to test every possible combination of feature subsets, with the exception of a "no feature" subset to avoid breaking the RFC. Like [ga.py](#gapy), it makes use of [getdata.py](#getdatapy) for pre-loading the database and [classifier.py](#classifierpy) for gathering the fitnesses of each chromosome.
+For smaller search spaces, `bruteforce.py` can be used to test every possible combination of feature subsets, with the exception of a "no feature" subset to avoid breaking the RFC. Like [ga.py](#gapy), it makes use of [getdata.py](#getdatapy) for pre-loading the database and [rfc.py](#rfcpy) for gathering the fitnesses of each chromosome.
 
-## classifier.py
+## rfc.py
 A helper file containing the implementation of a basic Random Forest Classifier. The average accuracy across three seeded runs produces the fitness for a chromosome.
 
 ```py
@@ -37,8 +37,25 @@ def evaluate(c: tuple, seed: int) -> float:
     # RFC Logic
 
 # Calculate the avg accuracy of a chromosome
-def avg_accuracy(c: tuple, runs=3) -> float:
+def avg_accuracy_rfc(c: tuple, runs=3) -> float:
+    acc = 0
     for i in range(runs): acc += evaluate(c, i)
+    return float(acc / runs)
+```
+
+# knn.py
+A helper file containing the implementation of a basic KNN classifier. Unlike [rfc.py](#rfcpy), the accuracy for a chromosome only needs to be evaluated once, since the current setup runs deterministically. This can be made stochastic by upping the number of `runs` in `avg_accuracy_knn()` and setting `random_state=1` to the `run` number.
+```py
+# Method for train/test using features selected by ga.py
+def evaluate_knn(c: tuple, k=5: int) -> float:
+    # ...
+    x_train, ... = train_test_split(..., random_state=1) # random_state could be set to the run num to add stochasticity
+    #...
+
+# Calculate the avg accuracy of a chromosome
+def avg_accuracy_knn(c: tuple, runs=1, k=5) -> float:
+    acc = 0
+    for r in range(runs): acc += evaluate_knn(c, r, k)
     return float(acc / runs)
 ```
 
@@ -93,7 +110,8 @@ Building on the idea of [caching](#caching), to keep computation expense low, we
 ```py
 x_train, x_test, y_train, y_test = train_test_split(..., random_state=1)
 ```
-On the contrary, to keep an element of stochasticity in training, all training and testing is done on seeds 1-`k` where `k` is the number of times each subset is evaluated. The average of the `k` accuracies from training is then returned as the fitness. 
+On the contrary, for the RFC, to keep an element of stochasticity, all training and testing is done on seeds 1-`k` where `k` is the number of times each subset is evaluated. The average of the `k` accuracies from training is then returned as the fitness. 
 ```py
 rfc = RandomForestClassifier(..., random_state=seed) # Seed = run num
 ```
+However, since the KNN classifier is distance-based and breaks any ties using the sum of distances for each class considered, ties *very* rarely occur. If they do, scikit-learn defaults to choosing the lower label, which in this case is `0: Non-diabetic`. Because of this, the knn is entirely deterministic. As explained in [knn.py](#knnpy), an element of stochasticity can be added by setting `random_state` to the run number.
