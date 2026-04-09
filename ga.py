@@ -1,7 +1,7 @@
 # The Genetic Algorithm for creating chromosomes for feature selection
 import random
 from getdata import load
-from classifier import avg_accuracy_rfc
+from rfc import avg_accuracy_rfc
 from knn import avg_accuracy_knn
 import matplotlib.pyplot as plt
 import time
@@ -20,7 +20,7 @@ ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
 GENERATIONS = 500 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = avg_accuracy_rfc((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # Equal to or better than the avg fitness of the chromosome with all features
+MAX_FITNESS = CLASSIFIER((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # Equal to or better than the avg fitness of the chromosome with all features
 COUNT = 0
 
 # Storage
@@ -38,7 +38,7 @@ def fitness(c: tuple):
         return 0
     COUNT += 1
     # Else, run it thrice and take the average
-    fit = avg_accuracy_rfc(c, runs=3)
+    fit = CLASSIFIER(c, runs=3)
 
     # Cache fitness and return
     cache[c] = fit
@@ -77,7 +77,7 @@ def gen_chromosome() -> tuple:
 
 def get_time(chromosome) -> float:
     start = time.time()
-    avg_accuracy_rfc(chromosome)
+    CLASSIFIER(chromosome)
     end = time.time()
     return end - start
 
