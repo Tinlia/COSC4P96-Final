@@ -1,5 +1,5 @@
 # Create every possible combination of features and test them with the classifier to get their fitnesses. 
-from classifier import avg_accuracy
+from rfc import avg_accuracy_rfc
 from getdata import load
 from itertools import product
 load()
@@ -16,7 +16,7 @@ def brute_force_search():
         if sum(combo) == 0:
             continue
         
-        score = avg_accuracy(combo)
+        score = avg_accuracy_rfc(combo)
         results.append((combo, score))
 
         if score > best_score:
