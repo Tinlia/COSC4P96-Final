@@ -4,6 +4,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from getdata import get
 
+RANDOM = 0 # 0: Deterministic, 1: Stochastic
+
+if RANDOM != 0 or RANDOM != 1:
+    raise ValueError("RANDOM must be either 0 (deterministic) or 1 (stochastic)")
+
 # KNN classifier
 def evaluate_knn(c: tuple, r: int, k: int) -> float:
     dataset = get()
@@ -40,6 +45,7 @@ def avg_accuracy_knn(c: tuple, runs=1, k=5) -> float:
     #  you can still test the avg accuracy without having to readd the avg accuracy function and refactor everything in ga.py.
 
     # Also, just changing "_rfc" to "_knn" for the CLASSIFIER hyparam in ga.py is so much easier
+    runs = runs**RANDOM # If deterministic, run once. If stochastic, run `runs` times and take the average
     acc = 0
     for r in range(runs):
         acc += evaluate_knn(c, r, k)
