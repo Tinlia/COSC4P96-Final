@@ -12,6 +12,7 @@ print("Dataset loaded successfully")
 
 # Hyperparameters
 CLASSIFIER = avg_accuracy_knn # avg_accuracy_knn or avg_accuracy_rfc
+FITNESS_REQ = 1.05 # The percentage increase in fitness required to accept a result (Default 5%)
 CHROMOSOME_LENGTH = 8
 POPULATION_SIZE = 30 
 MUTATION_RATE = 0.2
@@ -20,8 +21,8 @@ ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
 GENERATIONS = 500 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = CLASSIFIER((1, 1, 1, 1, 1, 1, 1, 1), runs=3) # Equal to or better than the avg fitness of the chromosome with all features
-COUNT = 0
+MAX_FITNESS = CLASSIFIER((1, 1, 1, 1, 1, 1, 1, 1), runs=3) * FITNESS_REQ # If a solution is 5% better than the avg fitness of the chromosome with all features, accept it
+COUNT = 0 
 
 # Storage
 cache = {} # Caches the average fitness of each chromsome to prevent excessive training (chromosome -> fitness)
@@ -162,9 +163,9 @@ with open("outputs/comparison.txt", "w") as f:
     all_time = get_time(all_c)
 
     f.write(f"All features chromosome fitness: {all_fit:.4f}\n")
-    f.write(f"\tModel Accuracy: {all_fit:.4f}\n")
+    f.write(f"\tModel Accuracy: {(all_fit * 100):.2f}%\n")
     f.write(f"\tTime Taken: {all_time:.4f} seconds\n\n")
 
     f.write(f"Best Chromosome {str(c)}\n")
-    f.write(f"\tModel Accuracy: {cfit:.4f}% (+{cfit - all_fit:.4f}%)\n")
+    f.write(f"\tModel Accuracy: {cfit * 100:.2f}% (+{(cfit - all_fit) * 100:.2f}%)\n")
     f.write(f"\tTime Taken: {ctime:.4f} seconds (-{ctime - all_time:.4f}s)\n\n")
