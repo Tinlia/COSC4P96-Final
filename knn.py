@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 from getdata import get
 
 # KNN classifier
-def evaluate_knn(c: tuple, k: int = 5) -> float:
+def evaluate_knn(c: tuple, r: int, k: int) -> float:
     dataset = get()
     x = [row[:-1] for row in dataset] # Feature list
     y = [row[-1] for row in dataset]  # Label List
@@ -34,8 +34,13 @@ def evaluate_knn(c: tuple, k: int = 5) -> float:
     return float(accuracy_score(y_test, y_pred))
 
 # Run the knn a few times to get the average acc and let that be the fitness
-def avg_accuracy_knn(c: tuple, runs=3, k=5) -> float:
+def avg_accuracy_knn(c: tuple, runs=1, k=5) -> float:
+    # A note for why this exists, what with the knn being entirely deterministic in its current state:
+    #  this is kept here so that if you want to add stochasticity to the knn (i.e., setting `random_state` in the t:t split to the run num)
+    #  you can still test the avg accuracy without having to readd the avg accuracy function and refactor everything in ga.py.
+
+    # Also, just changing "_rfc" to "_knn" for the CLASSIFIER hyparam in ga.py is so much easier
     acc = 0
-    for _ in range(runs):
-        acc += evaluate_knn(c, k)
+    for r in range(runs):
+        acc += evaluate_knn(c, r, k)
     return float(acc / runs)
