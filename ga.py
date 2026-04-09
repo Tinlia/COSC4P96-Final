@@ -12,7 +12,7 @@ print("Dataset loaded successfully")
 
 # Hyperparameters
 CLASSIFIER = avg_accuracy_knn # avg_accuracy_knn or avg_accuracy_rfc
-FITNESS_REQ = 1.05 # The percentage increase in fitness required to accept a result (Default 5%)
+FITNESS_REQ = 1.05            # The percentage increase in fitness required to accept a result (Default 5%)
 CHROMOSOME_LENGTH = 8
 POPULATION_SIZE = 30 
 MUTATION_RATE = 0.2
@@ -21,7 +21,7 @@ ELITISM_RATE = 0.1
 DIVERSITY_RATE = 0.1
 GENERATIONS = 500 
 TOURNAMENT_SIZE = 4
-MAX_FITNESS = CLASSIFIER((1, 1, 1, 1, 1, 1, 1, 1), runs=3) * FITNESS_REQ # If a solution is 5% better than the avg fitness of the chromosome with all features, accept it
+MAX_FITNESS = CLASSIFIER((1, 1, 1, 1, 1, 1, 1, 1), runs=3) * FITNESS_REQ # If a solution is n% better than the avg fitness of the chromosome with all features, accept it
 COUNT = 0 
 
 # Storage
@@ -108,7 +108,7 @@ for g in range(GENERATIONS):
 
     # Break condition for max fitness
     if pop[0][1] >= MAX_FITNESS:
-        print(f"Relative accuracy achieved at generation {g} with chromosome {str(pop[0][0])}")
+        print(f"Improved accuracy achieved at generation {g+1} with chromosome {str(pop[0][0])}")
         break
     new_pop = []
 
